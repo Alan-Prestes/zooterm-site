@@ -2,7 +2,7 @@
 // NUNCA inclua service_role, secret keys ou senhas neste repositório público.
 window.ZOOTERM_CONFIG = {
   supabaseUrl: 'https://tlyklekliqzitpxklpgz.supabase.co',
-  supabasePublishableKey: 'COLE_AQUI_A_CHAVE_PUBLICAVEL',
+  supabasePublishableKey: 'sb_publishable_qiN0AujXiEw5xg6F3Chbfg_NWCD0pxK',
   // O endereço do Shiny é apenas informativo nesta versão; acesso direto ainda NÃO está protegido.
   dashboardUrl: 'https://connect.posit.cloud/zooterm/content/01a2037f-633c-7607-bc80-c7021e29ad2e'
 };
