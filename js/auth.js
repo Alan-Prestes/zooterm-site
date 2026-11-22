@@ -465,6 +465,76 @@
     }
 
     // ----------------------------------------------------------
+    // TESTE DE AUTENTICAÇÃO COM A EDGE FUNCTION
+    // ----------------------------------------------------------
+
+    if (page === 'home') {
+      const botaoTeste = $('testar-conexao');
+      const resultadoTeste = $('resultado-conexao');
+
+      if (botaoTeste && resultadoTeste && client) {
+        botaoTeste.disabled = false;
+        resultadoTeste.textContent =
+          'Pronto para testar a conexão.';
+
+        botaoTeste.addEventListener('click', async () => {
+          botaoTeste.disabled = true;
+          resultadoTeste.textContent =
+            'Verificando autenticação...';
+
+          try {
+            // Obtém a sessão já existente no site.
+            const {
+              data: { session },
+              error: sessionError
+            } = await client.auth.getSession();
+
+            if (sessionError || !session) {
+              resultadoTeste.textContent =
+                'Sessão não encontrada. Faça login novamente.';
+              return;
+            }
+
+            // Solicita autorização à Edge Function.
+            const response = await fetch(
+              `${cfg.supabaseUrl}/functions/v1/zooterm-access`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'apikey': cfg.supabasePublishableKey,
+                  'Authorization':
+                    `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({})
+              }
+            );
+
+            const data = await response.json();
+
+            if (response.ok && data.access_token) {
+              resultadoTeste.textContent =
+                'Sucesso! Autenticação validada pelo Supabase. ' +
+                'Autorização temporária emitida.';
+            } else {
+              resultadoTeste.textContent =
+                `Falha na autenticação (HTTP ${response.status}): ` +
+                (data.error || 'Erro desconhecido');
+            }
+
+          } catch (error) {
+            resultadoTeste.textContent =
+              'Erro de comunicação com o Supabase: ' +
+              error.message;
+          } finally {
+            botaoTeste.disabled = false;
+          }
+        });
+      }
+    }
+
+
+    // ----------------------------------------------------------
     // PÁGINA INICIAL: SESSÃO E LOGOUT
     // ----------------------------------------------------------
 
