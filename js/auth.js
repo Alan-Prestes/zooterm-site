@@ -512,11 +512,18 @@
 
             const data = await response.json();
 
-            if (response.ok && data.access_token) {
-              resultadoTeste.textContent =
-                'Sucesso! Autenticação validada pelo Supabase. ' +
-                'Autorização temporária emitida.';
-            } else {
+if (response.ok && data.access_token) {
+  resultadoTeste.textContent =
+    'Autenticação validada. Abrindo o dashboard ZooTerm...';
+
+  const dashboardUrl =
+    'https://connect.posit.cloud/zooterm/content/01a2037f-633c-7607-bc80-c7021e29ad2e';
+
+  window.location.href =
+    dashboardUrl +
+    '#access_token=' +
+    encodeURIComponent(data.access_token);
+} else {
               resultadoTeste.textContent =
                 `Falha na autenticação (HTTP ${response.status}): ` +
                 (data.error || 'Erro desconhecido');
