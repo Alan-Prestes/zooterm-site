@@ -217,6 +217,45 @@
   document.addEventListener('DOMContentLoaded', async () => {
     const page = document.body.dataset.page;
 
+    
+    // ============================================================
+    // LOGOUT DO DASHBOARD SHINY
+    // ============================================================
+
+    // O logout do Supabase deve ocorrer no domínio do site,
+    // onde a sessão do usuário está armazenada.
+    // O Shiny deverá encerrar sua autorização antes de redirecionar
+    // para index.html?logout=dashboard.
+
+    if (page === 'home' &&
+        new URL(location.href).searchParams.get('logout') === 'dashboard') {
+
+      if (!ensure()) {
+        atualizarInterfaceHome(null);
+        return;
+      }
+
+      message('Encerrando sua sessão ZooTerm...');
+
+      try {
+        const { error } = await client.auth.signOut();
+
+        if (error) throw error;
+
+        // Remove o parâmetro para evitar repetir o logout.
+        location.replace(homeUrl());
+
+      } catch (error) {
+        message(
+          'Não foi possível encerrar a sessão. Tente novamente.',
+          'error'
+        );
+      }
+
+      return;
+    }
+
+
     // ----------------------------------------------------------
     // CADASTRO
     // ----------------------------------------------------------
