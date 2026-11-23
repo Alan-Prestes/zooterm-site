@@ -516,8 +516,8 @@ if (response.ok && data.access_token) {
   resultadoTeste.textContent =
     'Autenticação validada. Abrindo o dashboard ZooTerm...';
 
-  const dashboardUrl =
-    'https://connect.posit.cloud/zooterm/content/01a2037f-633c-7607-bc80-c7021e29ad2e';
+const dashboardUrl =
+  'https://zooterm-zooterm.share.connect.posit.cloud/';
 
   window.location.href =
     dashboardUrl +
