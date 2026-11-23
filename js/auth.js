@@ -159,9 +159,8 @@
       guest?.classList.remove('hidden');
     }
 
-    // Botões e mensagens da página inicial.
-    // A aplicação Shiny ainda não possui acesso protegido.
-    // Por isso, nenhum link direto ao dashboard é liberado.
+    // Apresenta o acesso ao dashboard apenas para usuários autenticados.
+    $('teste-conexao')?.classList.toggle('hidden', !user);
 
     const secoes = [
       document.querySelector('.hero .actions'),
@@ -194,7 +193,7 @@
       }
 
       aviso.textContent = user
-        ? 'Sua conta ZooTerm está ativa. O acesso seguro ao dashboard está em integração.'
+        ? 'Sua conta ZooTerm está ativa. Você já pode acessar a plataforma.'
         : '';
 
       aviso.classList.toggle('hidden', !user);
@@ -205,8 +204,8 @@
 
     if (descricao) {
       descricao.textContent = user
-        ? 'Seu cadastro foi confirmado. Estamos finalizando a integração segura com o dashboard.'
-        : 'Crie sua conta gratuitamente e confirme seu e-mail para utilizar a plataforma quando o acesso integrado estiver disponível.';
+        ? 'Seu cadastro foi confirmado. Acesse o dashboard para consultar os indicadores.'
+        : 'Crie sua conta gratuitamente e confirme seu e-mail para acessar a plataforma.';
     }
   }
 
@@ -217,44 +216,29 @@
   document.addEventListener('DOMContentLoaded', async () => {
     const page = document.body.dataset.page;
 
-    
-    // ============================================================
-    // LOGOUT DO DASHBOARD SHINY
-    // ============================================================
-
-    // O logout do Supabase deve ocorrer no domínio do site,
-    // onde a sessão do usuário está armazenada.
-    // O Shiny deverá encerrar sua autorização antes de redirecionar
+    // Retorno do botão Sair no Shiny. O logout do Supabase deve ocorrer
+    // no domínio do site, onde a sessão do usuário está armazenada.
+    // O servidor Shiny deverá encerrar a autorização ANTES de redirecionar
     // para index.html?logout=dashboard.
-
     if (page === 'home' &&
         new URL(location.href).searchParams.get('logout') === 'dashboard') {
-
       if (!ensure()) {
         atualizarInterfaceHome(null);
         return;
       }
 
       message('Encerrando sua sessão ZooTerm...');
-
       try {
         const { error } = await client.auth.signOut();
-
         if (error) throw error;
-
-        // Remove o parâmetro para evitar repetir o logout.
+        // Remove o marcador para evitar repetir o logout ao recarregar.
         location.replace(homeUrl());
-
       } catch (error) {
-        message(
-          'Não foi possível encerrar a sessão. Tente novamente.',
-          'error'
-        );
+        message('Não foi possível encerrar a sessão. Tente novamente.', 'error');
+        // Não iniciar o fluxo normal da página enquanto o logout falhou.
       }
-
       return;
     }
-
 
     // ----------------------------------------------------------
     // CADASTRO
@@ -504,7 +488,7 @@
     }
 
     // ----------------------------------------------------------
-    // TESTE DE AUTENTICAÇÃO COM A EDGE FUNCTION
+    // ACESSO SEGURO AO DASHBOARD
     // ----------------------------------------------------------
 
     if (page === 'home') {
@@ -514,12 +498,12 @@
       if (botaoTeste && resultadoTeste && client) {
         botaoTeste.disabled = false;
         resultadoTeste.textContent =
-          'Pronto para testar a conexão.';
+          '';
 
         botaoTeste.addEventListener('click', async () => {
           botaoTeste.disabled = true;
           resultadoTeste.textContent =
-            'Verificando autenticação...';
+            'Preparando seu acesso ao dashboard...';
 
           try {
             // Obtém a sessão já existente no site.
@@ -553,7 +537,7 @@
 
 if (response.ok && data.access_token) {
   resultadoTeste.textContent =
-    'Autenticação validada. Abrindo o dashboard ZooTerm...';
+    'Acesso autorizado. Abrindo o dashboard ZooTerm...';
 
 const dashboardUrl =
   'https://zooterm-zooterm.share.connect.posit.cloud/';
